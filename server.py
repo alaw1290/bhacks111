@@ -126,7 +126,7 @@ c = coupon(title = "Blendtec Blenders", description = "The most amazing blenders
 c1 = coupon(title = "S-works Tarmac", description = "Carbon that doesn't compromise stiffness for weight, getting the bast of both worlds.", image = "", initialPrice = 10000, value = 0.35, maxtime = 60 * 60, promotionEndTime = time() + 60 * 60 * 2)
 c.setNext(c1)
 
-s = server(coupon = c, port = 5000, maxclients = 5)
+s = server(coupon = c, port = 5000, maxClients = 5)
 s.run()
 
 
