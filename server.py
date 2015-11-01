@@ -3,7 +3,6 @@ import threading
 import socket
 
 
-
 class coupon:
 	def __init__(self, title, description, image, initialPrice, value, maxtime, promotionEndTime, counter = 10):
 		self.title = title
@@ -34,6 +33,8 @@ class coupon:
 	def __ascii__(self):
 		return b'{title:"%s", description:"%s", image:"%s", initialPrice:"%d", currentValue:"%f", maxtime:"%d"}' % (self.title, self.description, 
 			self.image, self.initialPrice, self.getValue(), self.maxtime)
+	def __final__(self):
+		return b'{product:"%s", discount:"%f"}' % (self.title, 1 - (self.getValue() / self.initialPrice))
 
 class serverWorker:
 	def __init__(self, clientInfo, coupon):
@@ -52,8 +53,8 @@ class serverWorker:
 				if data == "":
 					break
 				elif data == "I want that coupon.":
-					print self.coupon.resetTime()
-					self.connSocket.sendall(b"QR Code!")
+					self.connSocket.sendall(self.coupon.__final__())
+					self.coupon.resetTime()
 				else:
 					self.connSocket.sendall(self.coupon.__ascii__())
 		except socket.error, (code, message):
