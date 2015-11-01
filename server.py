@@ -123,17 +123,19 @@ class server:
 			serverWorker(clientInfo, self.coupon).run()
 '''
 
-c = coupon(title = "Blendtec Blenders", description = "The most amazing blenders in the world.", image = "http://osd.archive.neverbehind.com/wp-content/uploads/import/2013-522/Blendtec-Blender.jpg", initialPrice = 2000, value = 0.20, maxtime = 60, promotionEndTime = time() + (60 * 60))
+c0 = coupon(title = "Blendtec Blenders", description = "The most amazing blenders in the world.", image = "http://osd.archive.neverbehind.com/wp-content/uploads/import/2013-522/Blendtec-Blender.jpg", initialPrice = 2000, value = 0.20, maxtime = 60, promotionEndTime = time() + (60 * 60))
 c1 = coupon(title = "S-works Tarmac", description = "Carbon that doesn't compromise stiffness for weight, getting the bast of both worlds.", image = "http://s7d5.scene7.com/is/image/Specialized/145080?$Hero$", initialPrice = 10000, value = 0.35, maxtime = 60 * 60, promotionEndTime = time() + 60 * 60 * 2)
 c2 = coupon(title = "Krispy Kreme", description = "So good, you'll suck a dick. - Chris Rock", image = "http://www.newhealthadvisor.com/images/1HT00255/krispy+kreme4.jpg", initialPrice = 12, value = 0.10, maxtime = 60, promotionEndTime = time() + 60 * 60 * 2)
 c3 = coupon(title = "Male Grooming Kit", description = "Shout out to Adrian", image = "https://laynecorban.files.wordpress.com/2012/01/misterr-nesbitt-grooming-kit-1.jpg", initialPrice = 500, value = 0.15, maxtime = 60, promotionEndTime = time() + 60 * 60 * 2)
 c4 = coupon(title = "Full Body Sleeping Bag", description = "Get Sexiled in Style.", image = "http://i.imgur.com/oJxbxqi.jpg", initialPrice = 85, value = 0.75, maxtime = 60, promotionEndTime = time() + 60 * 60 * 2)
 
-c4.setNext(c)
+c4.setNext(c0)
 c3.setNext(c4)
 c2.setNext(c3)
 c1.setNext(c2)
-c.setNext(c1)
+c0.setNext(c1)
+
+c = c0
 
 class WebSocketHandler(websocket.WebSocketHandler):
 	def check_origin(self, origin):
