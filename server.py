@@ -47,12 +47,15 @@ class coupon:
 	def setTime(self, t):
 		self.time = t
 	def resetTime(self):
+		self.time = time()
+		''''
 		if time() < self.promotionEndTime:
 			self.time = time()
 			return True
 		else:
 			value = 0
 			return False
+		'''
 	def getValue(self):
 		x = self.initialPrice - (self.initialPrice * (1 - self.value))
 		return self.initialPrice - x * (min(time() - self.time, self.maxtime) ** 2 / self.maxtime ** 2)
