@@ -1,6 +1,10 @@
 from time import time
 import threading
 import socket
+import wolframalpha
+client = wolframalpha.Client("2VR45H-HK43G27ALG")
+
+
 
 
 class coupon:
@@ -14,6 +18,28 @@ class coupon:
 		self.promotionEndTime = promotionEndTime
 		self.time = time()
 		self.counter = counter
+		self.n = None
+	def changeCoupon(self, title, description, image, initialPrice, value, maxtime, promotionEndTime, counter = 10):
+		self.title = title
+		self.description = description
+		self.image = image
+		self.value = value
+		self.initialPrice = initialPrice
+		self.maxtime = maxtime
+		self.promotionEndTime = promotionEndTime
+		self.time = time()
+		self.counter = counter
+	def swapCoupon(self, c):
+		self.title = c.title
+		self.description = c.description
+		self.image = c.image
+		self.value = c.value
+		self.initialPrice = c.initialPrice
+		self.maxtime = c.maxtime
+		self.promotionEndTime = c.promotionEndTime
+		self.time = time()
+		self.counter = c.counter
+		self.n = c.next()
 	def getTitle(self):
 		return self.title
 	def getImage(self):
@@ -34,7 +60,13 @@ class coupon:
 		return b'{title:"%s", description:"%s", image:"%s", initialPrice:"%d", currentValue:"%f", maxtime:"%d"}' % (self.title, self.description, 
 			self.image, self.initialPrice, self.getValue(), self.maxtime)
 	def __final__(self):
-		return b'{product:"%s", discount:"%f"}' % (self.title, 1 - (self.getValue() / self.initialPrice))
+		res = client.query('QR Code ' + '{product:"%s", discount:"%f"}' % (self.title, 1 - (self.getValue() / self.initialPrice)))
+		img = res.pods[1].node._children[0]._children[1].attrib['src']
+		return b'{src: "%s", product:"%s", discount:"%f"}' % (img, self.title, 1 - (self.getValue() / self.initialPrice))
+	def setNext(self, n):
+		self.n = n
+	def next(self):
+		return self.n
 
 class serverWorker:
 	def __init__(self, clientInfo, coupon):
@@ -53,8 +85,16 @@ class serverWorker:
 				if data == "":
 					break
 				elif data == "I want that coupon.":
+					
 					self.connSocket.sendall(self.coupon.__final__())
 					self.coupon.resetTime()
+				elif data == "Next coupon please.":
+					if self.coupon.next() != None:
+						self.coupon.swapCoupon(self.coupon.next())
+						self.connSocket.sendall("New Coupon!" + self.coupon.__ascii__())
+						print("New Coupon!" + self.coupon.__ascii__())
+					else:
+						self.connSocket.sendall("No new coupon.")
 				else:
 					self.connSocket.sendall(self.coupon.__ascii__())
 		except socket.error, (code, message):
@@ -85,6 +125,8 @@ class server:
 
 curve = lambda x, y: x * ((float))
 c = coupon(title = "Blendtec Blenders", description = "The most amazing blenders in the world.", image = "http://pics.com", initialPrice = 2000, value = 0.20, maxtime = 60, promotionEndTime = time() + (60 * 60))
+c1 = coupon(title = "S-works Tarmac", description = "Carbon that doesn't compromise stiffness for weight, getting the bast of both worlds.", image = "", initialPrice = 10000, value = 0.35, maxtime = 60 * 60, promotionEndTime = time() + 60 * 60 * 2)
+c.setNext(c1)
 
 s = server(c, 5000, 5)
 s.run()
