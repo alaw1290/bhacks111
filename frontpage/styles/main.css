@@ -21,7 +21,6 @@ header {
 
 #coupon #timer {
     float: left;
-    width: 20%;
     height: 300px;
 }
 
@@ -36,7 +35,9 @@ header {
 button {
     clear: both;
     width: 100%;
-    background-color: darkred;
+    background-color: darkblue;
     padding: 3% 0%;
     bottom: 0px;
+    color: white;
+    font-size: 20px;
 }
