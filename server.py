@@ -57,12 +57,12 @@ class coupon:
 		x = self.initialPrice - (self.initialPrice * (1 - self.value))
 		return self.initialPrice - x * (min(time() - self.time, self.maxtime) ** 2 / self.maxtime ** 2)
 	def __ascii__(self):
-		return b'{title:"%s", description:"%s", image:"%s", initialPrice:"%d", currentValue:"%f", maxtime:"%d"}' % (self.title, self.description, 
+		return b'{"title":"%s", "description":"%s", "image":"%s", "initialPrice":"%d", "currentValue":"%f", "maxtime":"%d"}' % (self.title, self.description, 
 			self.image, self.initialPrice, self.getValue(), self.maxtime)
 	def __final__(self):
 		res = client.query('QR Code ' + '{product:"%s", discount:"%f"}' % (self.title, 1 - (self.getValue() / self.initialPrice)))
 		img = res.pods[1].node._children[0]._children[1].attrib['src']
-		return b'{src: "%s", product:"%s", discount:"%f"}' % (img, self.title, 1 - (self.getValue() / self.initialPrice))
+		return b'{"src": "%s", "product":"%s", "discount":"%f"}' % (img, self.title, 1 - (self.getValue() / self.initialPrice))
 	def setNext(self, n):
 		self.n = n
 	def next(self):
@@ -123,8 +123,15 @@ class server:
 			serverWorker(clientInfo, self.coupon).run()
 '''
 
-c = coupon(title = "Blendtec Blenders", description = "The most amazing blenders in the world.", image = "http://pics.com", initialPrice = 2000, value = 0.20, maxtime = 60, promotionEndTime = time() + (60 * 60))
-c1 = coupon(title = "S-works Tarmac", description = "Carbon that doesn't compromise stiffness for weight, getting the bast of both worlds.", image = "", initialPrice = 10000, value = 0.35, maxtime = 60 * 60, promotionEndTime = time() + 60 * 60 * 2)
+c = coupon(title = "Blendtec Blenders", description = "The most amazing blenders in the world.", image = "http://osd.archive.neverbehind.com/wp-content/uploads/import/2013-522/Blendtec-Blender.jpg", initialPrice = 2000, value = 0.20, maxtime = 60, promotionEndTime = time() + (60 * 60))
+c1 = coupon(title = "S-works Tarmac", description = "Carbon that doesn't compromise stiffness for weight, getting the bast of both worlds.", image = "http://s7d5.scene7.com/is/image/Specialized/145080?$Hero$", initialPrice = 10000, value = 0.35, maxtime = 60 * 60, promotionEndTime = time() + 60 * 60 * 2)
+c2 = coupon(title = "Krispy Kreme", description = "So good, you'll suck a dick. - Chris Rock", image = "http://www.newhealthadvisor.com/images/1HT00255/krispy+kreme4.jpg", initialPrice = 12, value = 0.10, maxtime = 60, promotionEndTime = time() + 60 * 60 * 2)
+c3 = coupon(title = "Male Grooming Kit", description = "Shout out to Adrian", image = "https://laynecorban.files.wordpress.com/2012/01/misterr-nesbitt-grooming-kit-1.jpg", initialPrice = 500, value = 0.15, maxtime = 60, promotionEndTime = time() + 60 * 60 * 2)
+c4 = coupon(title = "Full Body Sleeping Bag", description = "Get Sexiled in Style.", image = "http://i.imgur.com/oJxbxqi.jpg", initialPrice = 85, value = 0.75, maxtime = 60, promotionEndTime = time() + 60 * 60 * 2)
+
+c3.setNect(c4)
+c2.setNect(c3)
+c1.setNect(c2)
 c.setNext(c1)
 
 class WebSocketHandler(websocket.WebSocketHandler):

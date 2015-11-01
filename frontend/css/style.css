@@ -1,0 +1,8 @@
+.photo_center {
+	padding-left: auto;
+	padding-right: auto;
+	position: relative;
+}
+.hide {
+	display: none;
+}

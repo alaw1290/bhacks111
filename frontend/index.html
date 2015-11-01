@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" ng-app='tbbfcApp'>
+	<head>
+		<meta charset="utf-8" />
+		<link href='css/bootstrap.css' rel='stylesheet'>
+		<link href='css/style.css' rel='stylesheet'>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"></script>
+		<title>thebutton but for coupons</title>
+	</head>
+	<body ng-controller='tbbfcController as tb'>
+		<div id='coupon_watch' class='container {{tb.coupon_watch}}'>
+			<div class='row'>
+				<div class='col-xs-0 col-md-2'></div>
+				<div class='col-xs-12 col-md-8'>
+					<h1>thebutton but for coupons</h1>
+				</div>
+			</div>
+			<div class='row'>
+				<div class='col-xs-0 col-md-2'></div>
+				<div class='col-xs-12 col-md-8'>
+					<img src='{{tb.coupon_image}}' alt="sample picture">
+				</div>
+			</div>
+			<div class='row'>
+				<div class='col-xs-0 col-md-2'></div>
+				<div class='col-xs-12 col-md-8'>
+					<p>{{tb.desc_disp}}</p>
+				</div>
+			</div>
+			<div class='row'>
+				<div class='col-xs-0 col-md-2'></div>
+				<div class='col-xs-12 col-md-8'>
+					<button type="button" ng-click="tb.c_w_submit()" class="btn btn-primary btn-lg btn-block">I want this thebutton but for coupons coupon.</button>
+				</div>
+			</div>
+		</div>
+		<div id='your_coupon' class='container {{tb.your_coupon}}'>
+			<div class='row'>
+				<div class='col-xs-0 col-md-2'></div>
+				<div class='col-xs-12 col-md-8'>
+					<h2 style=''>Here is your thebutton but for coupons coupon.</h2>
+				</div>
+			</div>
+			<div class='row'>
+				<div class='col-xs-0 col-md-2'></div>
+				<div class='col-xs-12 col-md-8'>
+					<img src='{{tb.qr_image}}' alt='Your QR Code for your thebutton but for coupons coupon.'>
+				</div>
+			</div>
+			<div class='row'>
+				<div class='col-xs-0 col-md-2'></div>
+				<div class='col-xs-12 col-md-8'>
+					<p>{{tb.y_c_desc_disp}}</p>
+				</div>
+			</div>
+			<div class='row'>
+				<div class='col-xs-0 col-md-2'></div>
+				<div class='col-xs-12 col-md-8'>
+					<button type="button" ng-click='tb.y_c_submit()' class="btn btn-danger btn-lg btn-block">I'm done with this thebutton but for coupons coupons.</button>
+				</div>
+			</div>
+		</div>
+		<script>
+			//Global
+			var data = null;
+			var ofun = function () {}
+			
+			
+			var wsUri = "ws://localhost:5000"; 
+			var output;
+			var websocket;
+			
+			function init_ws(){
+				websocket = new WebSocket(wsUri); 
+				websocket.onopen = function(evt) { onOpen(evt) }; 
+				websocket.onclose = function(evt) { onClose(evt) }; 
+				websocket.onmessage = function(evt) { onMessage(evt) }; 
+				websocket.onerror = function(evt) { onError(evt) }; 
+			}
+			
+			function onOpen(evt) { 
+				console.log('connected');
+			}
+			function onClose(evt) {
+				console.log('connection closed');
+			}
+			function onMessage(evt) {
+				data = evt.data; 
+				console.log(data)
+				//websocket.close(); 
+			}
+			function onError(evt) { 
+				console.log('Error: ' + evt.data); 
+			}
+			function doSend(message) {
+				console.log("sent: " + message); 
+				websocket.send(message); 
+			}
+			
+			angular.module('tbbfcApp', []).controller('tbbfcController', function($scope, $interval, $timeout){
+				var tb = this;
+				tb.coupon_watch = '';
+				tb.your_coupon = 'hide';
+				tb.desc_disp = 'Loading...'
+				tb.coupon_image = ''
+				tb.qr_image = ''
+				tb.y_c_desc_disp = 'Loading...'
+				tb.update_object = {title: 'Product Title', description: 'PD', image: 'image01.jpg'};
+				tb.parseUpdate = function() {
+					tb.desc_disp = tb.update_object.title + ' | ' + tb.update_object.description + ' | Current Price: ' + tb.update_object.currentValue + ' | Discount Value: ' + (100 * (1 - tb.update_object.currentValue / tb.update_object.initialPrice)).toFixed(2) + '%'
+					tb.coupon_image = tb.update_object.image
+					console.log('updated', tb.desc_disp)
+					//$scope.$apply()
+				}
+				requestUpdate = function () {
+					websocket.send('hi');
+					tb.update_object = JSON.parse(data)
+					tb.parseUpdate();
+					/*if (data != null) {
+						tb.update_object = eval(data);
+						console.log(tb.update_object);
+						parseUpdate();
+					} else {
+						console.log('uh-oh');
+					}*/
+				}
+				tb.parseUpdate2 = function () {
+					desc_disp = 'Your the button but for coupons coupon got you ' + (100 * tb.update_object.discount).toFixed(2) + '% off for your ' +  tb.update_object.product
+					tb.qr_image = tb.update_object.src
+					
+					tb.y_c_desc_disp = desc_disp
+				}
+				requestUpdate2 = function () {
+					websocket.send('I want that coupon.')
+					var aux = function () {
+						tb.update_object = JSON.parse(data)
+						console.log(1, data)
+						tb.parseUpdate2()
+					}
+					$timeout(aux, 3000)
+				}
+				var timer = $interval(requestUpdate, 500)
+				//var inv = setInterval($apply(requestUpdate), 1000)
+				tb.c_w_submit = function () {
+					tb.coupon_watch = 'hide'
+					tb.your_coupon = ''
+					if (angular.isDefined(timer)){
+						$interval.cancel(timer);
+						timer = undefined
+					}
+					requestUpdate2()
+				}
+				tb.y_c_submit = function () {
+					tb.coupon_watch = ''
+					tb.your_coupon = 'hide'
+					timer = $interval(requestUpdate, 500)
+					tb.y_c_desc_disp = 'Loading...'
+					tb.qr_image = ''
+				}
+			});
+			function init() { 
+				output = document.getElementById("output"); 
+				init_ws()
+			}
+			
+			window.addEventListener("load", init, false);
+		</script>
+	</body>
+</html>
