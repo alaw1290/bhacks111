@@ -21,11 +21,16 @@ header {
 
 #coupon #timer {
     float: left;
+    width: 20%;
     height: 300px;
 }
 
 #coupon img {
     float: left;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #coupon #couponDescription {
