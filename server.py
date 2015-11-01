@@ -1,6 +1,6 @@
 from time import time
-import threading
-import socket
+#import threading, socket
+from tornado import web, websocket, ioloop
 import wolframalpha
 client = wolframalpha.Client("2VR45H-HK43G27ALG")
 
@@ -68,6 +68,8 @@ class coupon:
 	def next(self):
 		return self.n
 
+
+'''
 class serverWorker:
 	def __init__(self, clientInfo, coupon):
 		self.connSocket = clientInfo[0]
@@ -85,7 +87,6 @@ class serverWorker:
 				if data == "":
 					break
 				elif data == "I want that coupon.":
-					
 					self.connSocket.sendall(self.coupon.__final__())
 					self.coupon.resetTime()
 				elif data == "Next coupon please.":
@@ -120,13 +121,47 @@ class server:
 		while True:
 			clientInfo = s.accept()
 			serverWorker(clientInfo, self.coupon).run()
+'''
 
-curve = lambda x, y: x * ((float))
 c = coupon(title = "Blendtec Blenders", description = "The most amazing blenders in the world.", image = "http://pics.com", initialPrice = 2000, value = 0.20, maxtime = 60, promotionEndTime = time() + (60 * 60))
 c1 = coupon(title = "S-works Tarmac", description = "Carbon that doesn't compromise stiffness for weight, getting the bast of both worlds.", image = "", initialPrice = 10000, value = 0.35, maxtime = 60 * 60, promotionEndTime = time() + 60 * 60 * 2)
 c.setNext(c1)
 
+class WebSocketHandler(websocket.WebSocketHandler):
+	def check_origin(self, origin):
+		return True
+	
+	def open(self):
+		print "New client connected"
+		self.write_message(c.__ascii__())
+
+	def on_message(self, message):
+		if message == 'I want that coupon.':
+			self.write_message(c.__final__())
+			c.resetTime()
+		elif message == 'Next coupon please.':
+			if c.next != None:
+				c.swapCoupon(c.next())
+				self.write_message(c.__ascii__())
+			else:
+				self.write_message('No new message.')
+		else:
+			self.write_message(c.__ascii__())
+
+	def on_close(self):
+		print "Client disconnected"
+
+application = web.Application([
+    (r"/", WebSocketHandler),
+])
+ 
+if __name__ == "__main__":
+    application.listen(5000)
+    ioloop.IOLoop.instance().start()
+
+
+'''
 s = server(coupon = c, port = 5000, maxClients = 5)
 s.run()
-
+'''
 
