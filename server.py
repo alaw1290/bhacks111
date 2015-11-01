@@ -129,9 +129,9 @@ c2 = coupon(title = "Krispy Kreme", description = "So good, you'll suck a dick. 
 c3 = coupon(title = "Male Grooming Kit", description = "Shout out to Adrian", image = "https://laynecorban.files.wordpress.com/2012/01/misterr-nesbitt-grooming-kit-1.jpg", initialPrice = 500, value = 0.15, maxtime = 60, promotionEndTime = time() + 60 * 60 * 2)
 c4 = coupon(title = "Full Body Sleeping Bag", description = "Get Sexiled in Style.", image = "http://i.imgur.com/oJxbxqi.jpg", initialPrice = 85, value = 0.75, maxtime = 60, promotionEndTime = time() + 60 * 60 * 2)
 
-c3.setNect(c4)
-c2.setNect(c3)
-c1.setNect(c2)
+c3.setNext(c4)
+c2.setNext(c3)
+c1.setNext(c2)
 c.setNext(c1)
 
 class WebSocketHandler(websocket.WebSocketHandler):
